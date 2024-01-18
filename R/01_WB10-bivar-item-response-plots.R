@@ -20,7 +20,8 @@ plot_biver_prop <- function(x, title = "", xlab = "", ylab = "") {
 #' 
 #' @param y_item Character string. WB10 item label
 #' @param x_items Charactor vector. WB10 item labels
-#'
+#' @param data Data.frame. PC data
+#' 
 #' @export
 plot_WB10_responses <- function(data, y_item, x_items) {
   v2plot <- list()
