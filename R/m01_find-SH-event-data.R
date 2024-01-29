@@ -31,14 +31,17 @@ sh_event_data_1patient <- function(x, days_between = 5) {
   rles <- rle(x[["SelfHarmEvent"]])
   #sh_event.i <- vector("numeric", length = sum(rles[[2]]))
   sh_event.i <- list()
-  event_number <- 0
-  for (i in 2:length(rles[[1]]))
-    if(length(rles[[2]]) == 1 && rles[[2]] == 1) {
-      sh_event.i <- seq_len(rles[[1]])
-    }
-  else if(rles[[1]][i-1] >= days_between && rles[[2]][i-1] == 0 && rles[[2]][i] == 1) {
-    event_number <- event_number + 1
-    sh_event.i[[event_number]] <- sum(rles[[1]][1:i])  #!!!! fix this line. replace index to left of assignment!
+  if(length(rles[[2]]) == 1 && rles[[2]] == 1 && days_between == 0) {   # patient self-harms on all days and days_lag = 0
+    sh_event.i[[event_number]] <- seq_len(rles[[1]])
+  } else if(length(rles[[2]]) == 1 && rles[[2]] == 1 && days_between > 0) {
+    # return no value for this case
+    sh_event.i[[event_number]] <- NULL
+  } else if(rles[[2]][i-1] == 0 && rles[[1]][i-1] >= days_between && rles[[2]][i] == 1) { # most common case: no self-harm days and sh days interspersed
+    event_number <- 0
+    for (i in 2:length(rles[[1]])) {
+      event_number <- event_number + 1
+      sh_event.i[[event_number]] <- sum(rles[[1]][1:i])  
+    } 
   }
   sh_event.i <- unlist(sh_event.i)
   return_rows <- list()
@@ -57,6 +60,9 @@ sh_event_data_1patient <- function(x, days_between = 5) {
 #' @export
 get_self_harm_data <- function(PCdata, days_lag){
   patient_data <- split(pc_data, pc_data$NewMRN)
+  # remove patients with missing CurrentLOS
+  patients_without_LOS <- which(sapply(patient_data, function(x) any(is.na(x$CurrentLOS))))
+  patient_data <- patient_data[-patients_without_LOS]
   # find patients who have had a sh event
   sh_patients <- which(sapply(patient_data, function(x) any(x[["SelfHarmEvent"]] == 1)))
   sh_patient_data <- list()
