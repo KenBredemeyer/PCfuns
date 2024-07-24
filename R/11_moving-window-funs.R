@@ -18,7 +18,8 @@ combine_extra_WB10_values <- function(x, i=i, X_window = X_window, items = items
 }
 
 
-#' create moving window in X
+#' Format data for time series embedding
+#' 
 #' Combine multiple days worth of WB10 data in a single row, along with the
 #' other explanatory variables, for the purpose of predicting SH in the future
 #' function formats X data. Use ___ to prepare Y data.
@@ -61,6 +62,7 @@ moving_window_X <- function(x, X_window = 2, items = WB10_items) {
 #' @param x data.frame
 #' @param X_window integer. days worth of daily data used in X, per row
 #' @param prediction_window integer. Number of days.
+#' @export
 prediction_window_Y <- function(x, X_window, prediction_window){
   stopifnot(any(names(x)=="NewMRN") & any(names(x)=="SelfHarmEvent"))
   person_visit.list <- split(x, x$NewMRN) # use only NewMRNs that exist in corresp. X
